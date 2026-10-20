@@ -1,3 +1,25 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+from dotenv import load_dotenv
+import os
+import asyncio
+from datetime import datetime, timedelta
+import gzip
+import io
+import requests
+from tmdbv3api import TMDb, Movie
+
+load_dotenv(override = True)
+print(os.environ["API_tmdb"])
+print(os.environ["API_tmdb_lecture"])
+
+tmdb = TMDb()
+tmdb.api_key = os.environ["API_tmdb"]
+tmdb.language = 'fr'
+tmdb.debug = True
+
+movie_api = Movie()
+
 def fetch_movie_details(movie_id):
     try:
         details = movie_api.details(movie_id)
