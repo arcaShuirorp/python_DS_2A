@@ -1,9 +1,8 @@
-import pandas
-import matplotlib
+import matplotlib.pyplot as plt
+import pandas as pd
 from dotenv import load_dotenv
 import os
 import asyncio
-import pandas as pd
 
 from datetime import datetime, timedelta
 import gzip
@@ -113,8 +112,9 @@ def fetch_movie_details(movie_id):
                 else None
             ),
         }
-    except Exception:
+    except Exception as e:
         # En cas d'erreur (ex: film introuvable, problème réseau), on retourne un dictionnaire vide ou rempli de None
+        print(f"Une erreur s'est produite : \n {e}")
         return {}
 
 test = fetch_movie_details(67)
