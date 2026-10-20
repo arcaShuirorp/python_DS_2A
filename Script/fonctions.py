@@ -10,8 +10,7 @@ import requests
 from tmdbv3api import TMDb, Movie
 
 load_dotenv(override = True)
-print(os.environ["API_tmdb"])
-print(os.environ["API_tmdb_lecture"])
+
 
 tmdb = TMDb()
 tmdb.api_key = os.environ["API_tmdb"]
