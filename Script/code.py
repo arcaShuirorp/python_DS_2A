@@ -65,28 +65,33 @@ def fetch_movie_details(movie_id):
             "tagline": getattr(details, "tagline", None),
             "overview": getattr(details, "overview", None),
             "homepage": getattr(details, "homepage", None),
-            
+
             # --- Dates, Durée et Statut ---
             "release_date": getattr(details, "release_date", None),
             "runtime": getattr(details, "runtime", None),  # En minutes
             "status": getattr(
                 details, "status", None
             ),  # Ex: Released, Rumored, Post Production
+
             # --- Données Financières ---
             "budget": getattr(details, "budget", None),  # En USD
             "revenue": getattr(details, "revenue", None),  # En USD
+
             # --- Statistiques et Popularité ---
             "popularity": getattr(details, "popularity", None),
             "vote_average": getattr(details, "vote_average", None),  # Note sur 10
             "vote_count": getattr(details, "vote_count", None),
+
             # --- Contenu Adulte ---
             "adult": getattr(details, "adult", None),
             "video": getattr(
                 details, "video", None
             ),  # True s'il y a une vidéo principale associée
+
             # --- Images (Chemins relatifs à compléter avec l'URL de base TMDb) ---
             "poster_path": getattr(details, "poster_path", None),
             "backdrop_path": getattr(details, "backdrop_path", None),
+            
             # --- Listes et Données Structurées (Listes d'objets ou dictionnaires) ---
             "genres": [
                 g["name"] for g in getattr(details, "genres", [])
@@ -101,6 +106,7 @@ def fetch_movie_details(movie_id):
             "spoken_languages": [
                 l["iso_639_1"] for l in getattr(details, "spoken_languages", [])
             ],  # Codes langues (ex: 'en', 'fr')
+
             # --- Collection ---
             "belongs_to_collection_id": (
                 details.belongs_to_collection.get("id")
@@ -111,7 +117,7 @@ def fetch_movie_details(movie_id):
                 details.belongs_to_collection.get("name")
                 if getattr(details, "belongs_to_collection", None)
                 else None
-            ),
+            )
         }
     except Exception:
         # En cas d'erreur (ex: film introuvable, problème réseau), on retourne un dictionnaire vide ou rempli de None
