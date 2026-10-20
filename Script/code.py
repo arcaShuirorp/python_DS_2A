@@ -65,4 +65,5 @@ def fetch_movie_details(movie_id):
         # En cas d'erreur ou d'ID invalide, renvoie des valeurs vides
         return {"runtime": None, "budget": None, "revenue": None, "genres": []}
 
-fetch_movie_details(67)
+test = fetch_movie_details(67)
+print(test)
