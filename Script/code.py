@@ -5,6 +5,12 @@ import os
 import asyncio
 import pandas as pd
 
+from datetime import datetime, timedelta
+import gzip
+import io
+import requests
+
+
 
 
 ### TESTS DES SECRETS
@@ -58,3 +64,5 @@ def fetch_movie_details(movie_id):
     except Exception:
         # En cas d'erreur ou d'ID invalide, renvoie des valeurs vides
         return {"runtime": None, "budget": None, "revenue": None, "genres": []}
+
+fetch_movie_details(67)
