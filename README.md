@@ -34,3 +34,13 @@ tree
 │       ├── test de l'importation.py            #Importation des données via l'API TMDB 
 │       └── test.ipynb
 └── synthese.ipynb
+
+
+
+#Instruction pour reproduction
+
+```{bash}
+git clone https://github.com/username/nom_du_repo.git
+cd nom_du_repo
+```
+#Installation des extensions :
