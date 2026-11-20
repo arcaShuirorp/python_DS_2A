@@ -1,5 +1,7 @@
 import os
+import time
 import asyncio
+from tenacity import retry, stop_after_attempt, wait_incrementing, retry_if_result
 import pandas as pd
 from dotenv import load_dotenv
 from tmdbv3api import TMDb, Movie, Discover
@@ -20,23 +22,18 @@ CONCURRENCY = 20       # nombre d'appels simultanés (TMDb tolère ~50 req/s)
 
 
 # --------------------------------------------------------------------------
-# 1)Pour éviter de dépasser la limite de l'API si on l'attend on attend 1. 5 s 
+# 1)Pour éviter de dépasser la limite de l'API si on l'attend on attend 1.5 s 
 #   quand il y a un problème
 # --------------------------------------------------------------------------
 
-
-def fetch_with_retry(movie_id, retries=3):
-    for attempt in range(retries):
-        result = fetch_movie_details(movie_id)
-        if result:
-            return result
-        import time
-        time.sleep(1.5 * (attempt + 1))
-    return {}
-
+@retry(stop=stop_after_attempt(3),
+       wait=wait_incrementing(start=1.5, increment=1.5),
+       retry_error_callback=lambda x:{})
+def fetch_with_retry(movie_id):
+    return fetch_movie_details(movie_id)
 
 # ---------------------------------------------------------------------------
-# 3) Récupération des IDs via /discover/movie
+# 2) Récupération des IDs via /discover/movie
 # ---------------------------------------------------------------------------
 
 def fetch_discover_page(page):
@@ -51,7 +48,6 @@ def fetch_discover_page(page):
             results = discover_api.discover_movies(params)
             return [m.id for m in results]
         except Exception:
-            import time
             time.sleep(1.5 * (attempt + 1))
     return []
 
@@ -75,7 +71,7 @@ async def collect_movie_ids():
 
 
 # ---------------------------------------------------------------------------
-# 4) Récupération des détails en parallèle
+# 3) Récupération des détails en parallèle
 # ---------------------------------------------------------------------------
 
 async def collect_details(movie_ids):
@@ -96,7 +92,7 @@ async def collect_details(movie_ids):
 
 
 # ---------------------------------------------------------------------------
-# 5) Main
+# 4) Main
 # ---------------------------------------------------------------------------
 async def main():
     print("Récupération des IDs...")
@@ -107,9 +103,9 @@ async def main():
     rows = await collect_details(movie_ids)
 
     df = pd.DataFrame(rows)
-    df = df.drop_duplicates("id").reset_index(drop=True) #On verifie les doublons et on index propremetnt
+    df = df.drop_duplicates("id").reset_index(drop=True)  # On vérifie les doublons et on index proprement
 
-    df.to_csv("tmdb_movies_10k.csv", index=False, encoding="utf-8") #On convertit en csv et on sauvegarde
+    df.to_csv("tmdb_movies_10k.csv", index=False, encoding="utf-8")  # On convertit en csv et on sauvegarde
     print(f"Terminé : {len(df)} films sauvegardés dans tmdb_movies_10k.csv")
     return df
 
