@@ -1,21 +1,21 @@
 # python_DS_2A
 Projet de Python pour la Data Science (cours du 1er semestre de 2A à l'ENSAE).
 
-Ce projet utilise les bases de données de TMDB (The movie data base), et IMDB pour chercher des corrélations entre le succès commercial et les autres facteurs à dispositions.
+Ce projet utilise les bases de données de TMDB (The Movie Data Base), et IMDB pour chercher des corrélations entre le succès commercial et les autres facteurs à dispositions.
 
 
-#Source de données
+## Sources des données utilisées
 
 Les données proviennent des sources suivantes :
 
-TMDB : Accès via API, l'importation n'est pas possible sans clé API obtenable gratuitement sur le site
-       Note des films, nombre de vote, cast, budget, succès commercial etc...
+TMDB : Accès via API (l'importation n'est pas possible sans clé API obtenable gratuitement sur le site)
+       Note du film, nombre de votes, cast, budget, succès commercial etc...
 
-IMDB : Accès via base de donnée téléchargable 
-       Note de film et nombre de vote
+IMDB : Accès via base de données téléchargable 
+       Note du film, nombre de votes
 
 
-#Architecture
+## Architecture
 
 Ne pas hésiter à installer `tree` dans le terminal pour faciliter la visualisation :
 
@@ -37,10 +37,13 @@ tree
 
 
 
-#Instruction pour reproduction
+## Instruction pour reproduction
 
 ```{bash}
 git clone https://github.com/username/nom_du_repo.git
 cd nom_du_repo
 ```
-#Installation des extensions :
+
+
+# Installation des extensions :
+    **à compléter**
