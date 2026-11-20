@@ -1,5 +1,5 @@
 # python_DS_2A
-Projet de Python pour la Data Science (cours du 1er semestre de 2A à l'ENSAE).
+#### Projet de Python pour la Data Science (cours du 1er semestre de 2A à l'ENSAE).
 
 Ce projet utilise les bases de données de TMDB (The Movie Data Base), et IMDB pour chercher des corrélations entre le succès commercial et les autres facteurs à dispositions.
 
@@ -28,13 +28,14 @@ python_DS_2A
 ├── data/                                   # Dossier généré contenant les données générées
 └── Script/
     ├── code.py
-    ├── fetch_TMDB.py                       # Collecte des films via l'API TMDb
+    ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
     └── test.ipynb
 ```
 
 
 ## Installation
 
+### Windows 
 ```bash
 git clone https://github.com/[username]/[repo].git
 cd [repo]
@@ -46,25 +47,28 @@ python -m pip install -r requirements.txt
 
 Le projet utilise `tmdbv3api` qui permet de réaliser des appels API à la base de données TMDb à condition de posséder une clé API TMDb.
 
-Voir la documentation ici : https://developer.themoviedb.org/docs/getting-started
+Voir la documentation de `tmdbv3api` [ici](https://github.com/AnthonyBloomer/tmdbv3api).
+
+Voir la documentation API [ici](https://developer.themoviedb.org/docs/getting-started).
 
 Une fois la clé API obtenue :
-1. Créer un fichier `.env` à la racine du projet
+1. Créer un fichier `.env` *à la racine du projet* ;
 2. Renseigner la clé API selon le format suivant : 
 
 ```text
 API_tmdb=[cle_api]
 ```
 
-## Génération de données
+## Génération des jeux de données
 
-### Jeu de données TMDb
+### Jeu de données TMDB
 
-Pour générer le jeu de données à partir de la base TMDb :
+Pour générer le jeu de données à partir de la base TMDB :
 
 ```bash
 python Script/fetch_TMDB.py
 ```
 
 Cela génère une table Parquet dans le chemin `data/tmdb_movies_10k.parquet`. 
+
 *TODO: décrire la table ?*
