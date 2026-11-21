@@ -24,11 +24,11 @@ python_DS_2A
 ├── requirements.txt
 ├── LICENSE
 ├── README.md
-├── synthese.ipynb
 ├── data/                                   # Dossier généré contenant les données générées
 └── Script/
     ├── code.py
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
+    ├── fetch_IMDB.py                       # Collecte des films depuis la base IMDB
     └── test.ipynb
 ```
 
@@ -47,9 +47,9 @@ python -m pip install -r requirements.txt
 
 Le projet utilise `tmdbv3api` qui permet de réaliser des appels API à la base de données TMDb à condition de posséder une clé API TMDb.
 
-Voir la documentation de `tmdbv3api` [ici](https://github.com/AnthonyBloomer/tmdbv3api).
+ * Voir la documentation de `tmdbv3api` [ici](https://github.com/AnthonyBloomer/tmdbv3api).
 
-Voir la documentation API [ici](https://developer.themoviedb.org/docs/getting-started).
+ * Voir la documentation API [ici](https://developer.themoviedb.org/docs/getting-started).
 
 Une fois la clé API obtenue :
 1. Créer un fichier `.env` *à la racine du projet* ;
