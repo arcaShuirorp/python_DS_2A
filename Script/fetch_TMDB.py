@@ -33,10 +33,7 @@ THREADS = 10           # nombre d'appels simultanés (TMDb tolère ~40 req/s)
        retry_error_callback=lambda x:{})
 def fetch_movie_details(movie_id):
     """
-    Etant donnée un movie_id, renvoie les détails associés à ce film dans un dictionnaire.
-
-    PS: je laisse la fonction au dessus pour l'instant, mais celle-là marche direct avec un retry et est peut-être
-    plus lisible ????
+    Etant donné un movie_id, renvoie les détails associés à ce film dans un dictionnaire.
     """
 
     details = movie_api.details(movie_id)
@@ -111,8 +108,7 @@ def main():
 
     df.to_parquet(OUTPUT_DIR / FILE_NAME, index=False)   # On convertit en parquet (plus cool) et on sauvegarde
     print(f"Terminé : {len(df)} films sauvegardés dans {OUTPUT_DIR / FILE_NAME}")
-    return df
 
 
 if __name__ == "__main__":
-    df = main()
+    main()

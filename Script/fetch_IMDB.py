@@ -1,17 +1,21 @@
+import os
 from pathlib import Path
-import requests             #telécharger depuis imdb
+import requests             # Télécharger depuis IMDB
 import pandas as pd
-from tqdm import tqdm       #afficher barre de progression
+from tqdm import tqdm       # Afficher barre de progression
 
 import pyarrow as pa
 import pyarrow.parquet as pq
+import csv
 
-# Configuration 
+# === Configuration 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = BASE_DIR / "data"
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
-BASE_URL = "https://datasets.imdbws.com/" #on télécharge les fichier depuis là
+BASE_URL = "https://datasets.imdbws.com/"  # On télécharge les fichiers depuis cet URL
 
 FILES = [
     "title.basics.tsv.gz",
@@ -20,11 +24,11 @@ FILES = [
     "title.principals.tsv.gz"
 ]
 
-chunk_size = 200_000 #Permet de pas convertir d'un coup mais bout par bout pour éviter de tuer la ram
+chunk_size = 200_000  # Permet de pas convertir d'un coup mais bout par bout pour éviter de tuer la ram
 TIMEOUT = 60
 
 
-#Téléchargement
+# === Téléchargement
 
 def download_file(filename):
     """
@@ -47,7 +51,7 @@ def download_file(filename):
 
 
 
-#Lecture des .gz convertion en parquet 
+# === Lecture des .gz convertion en parquet 
 
 
 def convert_to_parquet(filename):
@@ -64,37 +68,34 @@ def convert_to_parquet(filename):
         sep="\t",
         chunksize=chunk_size,
         dtype="string",
-        na_values="\\N"
-    )                       #Le fichier en format dataframe qu'on va convertir en parquet
+        na_values="\\N",
+        quoting=csv.QUOTE_NONE
+    )                       # Le fichier en format dataframe qu'on va convertir en parquet
 
     writer = None
     total_rows = 0
 
-    for chunk in tqdm(reader, desc=output_name): #Chunk est un bou de reader de taille chunk_size
+    for chunk in tqdm(reader, desc=output_name):  # Chunk est un bout de reader de taille chunk_size
 
         table = pa.Table.from_pandas(
             chunk,
-            preserve_index=False #Pas besoin de conserver l'index panda car il existe sur IMDB
+            preserve_index=False # Pas besoin de conserver l'index panda car il existe sur IMDB
         )
 
         if writer is None:
             writer = pq.ParquetWriter(
                 output_path,
                 table.schema,
-                compression="snappy" #compromis taille de fichier vitesse
+                compression="snappy" # Compromis taille de fichier vitesse
             )
 
         writer.write_table(table)
         total_rows += len(chunk)
 
-
     print(f"{total_rows:,} lignes sauvegardées dans {output_name}")
 
 
-#Fait tout ça 
-
 def main():
-
 
     for filename in FILES:
 

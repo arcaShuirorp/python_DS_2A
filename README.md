@@ -37,8 +37,8 @@ python_DS_2A
 
 ### Windows 
 ```bash
-git clone https://github.com/[username]/[repo].git
-cd [repo]
+git clone https://github.com/arcaShuirorp/python_DS_2A.git
+cd python_DS_2A
 python -m pip install -r requirements.txt 
 ```
 
