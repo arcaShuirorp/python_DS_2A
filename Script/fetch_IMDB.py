@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import requests             #telécharger depuis imdb
 import pandas as pd
@@ -32,27 +31,17 @@ def download_file(filename):
     Télécharge un fichier IMDb .tsv.gz, le sauvegarde dans le dossier data.
     """
 
-    url = BASE_URL + filename
-    output_path = OUTPUT_DIR / filename
-
     print(f"\nTéléchargement de {filename}...")
 
-    response = requests.get(url, stream=True, timeout=TIMEOUT)
-    
+    response = requests.get(BASE_URL + filename, stream=True, timeout=TIMEOUT)
     total_size = int(response.headers.get("content-length", 0))
 
-    with open(output_path, "wb") as file:
-        with tqdm(
-            total=total_size,
-            unit="B",
-            unit_scale=True,
-            desc=filename
-        ) as progress:
-
-            for chunk in response.iter_content(chunk_size=1024 * 1024):
-                if chunk:
-                    file.write(chunk)
-                    progress.update(len(chunk))
+    with open(OUTPUT_DIR / filename, "wb") as file, tqdm(
+        total=total_size, unit="B", unit_scale=True, desc=filename
+    ) as progress:
+        for chunk in response.iter_content(chunk_size=1024 * 1024):
+            file.write(chunk)
+            progress.update(len(chunk))
 
     print(f"Téléchargement terminé : {filename}")
 
@@ -73,7 +62,6 @@ def convert_to_parquet(filename):
     reader = pd.read_csv(
         input_path,
         sep="\t",
-        compression="gzip",
         chunksize=chunk_size,
         dtype="string",
         na_values="\\N"
@@ -99,8 +87,6 @@ def convert_to_parquet(filename):
         writer.write_table(table)
         total_rows += len(chunk)
 
-    if writer is not None:
-        writer.close()
 
     print(f"{total_rows:,} lignes sauvegardées dans {output_name}")
 
