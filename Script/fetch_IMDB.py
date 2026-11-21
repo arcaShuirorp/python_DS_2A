@@ -21,7 +21,7 @@ FILES = [
     "title.principals.tsv.gz"
 ]
 
-CHUNK_SIZE = 200_000 #Permet de pas convertir d'un coup mais bout par bout pour éviter de tuer la ram
+chunk_size = 200_000 #Permet de pas convertir d'un coup mais bout par bout pour éviter de tuer la ram
 TIMEOUT = 60
 
 
@@ -74,26 +74,26 @@ def convert_to_parquet(filename):
         input_path,
         sep="\t",
         compression="gzip",
-        chunksize=CHUNK_SIZE,
+        chunksize=chunk_size,
         dtype="string",
         na_values="\\N"
-    )                       #Le fichier qu'on va convertir
+    )                       #Le fichier en format dataframe qu'on va convertir en parquet
 
     writer = None
     total_rows = 0
 
-    for chunk in tqdm(reader, desc=output_name):
+    for chunk in tqdm(reader, desc=output_name): #Chunk est un bou de reader de taille chunk_size
 
         table = pa.Table.from_pandas(
             chunk,
-            preserve_index=False
+            preserve_index=False #Pas besoin de conserver l'index panda car il existe sur IMDB
         )
 
         if writer is None:
             writer = pq.ParquetWriter(
                 output_path,
                 table.schema,
-                compression="snappy"
+                compression="snappy" #compromis taille de fichier vitesse
             )
 
         writer.write_table(table)
