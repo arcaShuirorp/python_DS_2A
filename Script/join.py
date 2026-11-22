@@ -115,7 +115,24 @@ films = films.merge(
     validate="many_to_one"
 )
 
+# Renommage des colonnes pour identifier leur source
+films = films.rename(columns={
+    "vote_average": "vote_average_TMDB",
+    "vote_count": "vote_count_TMDB",
+    "genres_x": "genres_TMDB",
 
+    "averageRating": "averageRating_IMDb",
+    "numVotes": "numVotes_IMDb",
+    "genres_y": "genres_IMDb",
+    "runtimeMinutes": "runtimeMinutes_IMDb",
+    "startYear": "startYear_IMDb",
+    "titleType": "titleType_IMDb",
+    "primaryTitle": "primaryTitle_IMDb",
+    "originalTitle": "originalTitle_IMDb",
+    "directors": "directors_IMDb",
+    "writers": "writers_IMDb",
+    "principals": "principals_IMDb"
+})
 
 # Export
 films.to_parquet(OUTPUT_FILE, index=False)

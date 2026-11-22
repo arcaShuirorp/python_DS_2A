@@ -2,6 +2,6 @@ import pandas as pd
 
 
 
-df = pd.read_parquet("data/tmdb_movies_10k.parquet")
+df = pd.read_parquet("data/films_merged.parquet")
 
-print(df.head())
+print(df.columns)
