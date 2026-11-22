@@ -21,7 +21,8 @@ FILES = [
     "title.basics.tsv.gz",
     "title.ratings.tsv.gz",
     "title.crew.tsv.gz",
-    "title.principals.tsv.gz"
+    "title.principals.tsv.gz",
+    "name.basics.tsv.gz"
 ]
 
 chunk_size = 200_000  # Permet de pas convertir d'un coup mais bout par bout pour éviter de tuer la ram
