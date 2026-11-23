@@ -29,6 +29,7 @@ python_DS_2A
     ├── code.py
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
     ├── fetch_IMDB.py                       # Collecte des films depuis la base IMDB
+    ├── join.py                             # Joint à gauche la base de donnée IMDb sur la base de donnée TMDB
     └── test.ipynb
 ```
 
@@ -71,4 +72,23 @@ python Script/fetch_TMDB.py
 
 Cela génère une table Parquet dans le chemin `data/tmdb_movies_10k.parquet`. 
 
-*TODO: décrire la table ?*
+### Jeu de données IMDB
+
+Pour générer le jeu de données à partir de la base Imdb :
+
+```bash
+python Script/fetch_IMDB.py
+```
+
+Cela génère quatre tablesParquet dans le chemin `data/title.crew.parquet`,`data/title.principals.parquet`,`data/name.basics.parquet`,`data/title.ratings.parquet`.
+
+
+### Créer la base donnée finale
+
+Pour créer la base de donnée finale à  partir des données IMDb et TMDB
+
+```bash
+python Script/join.py
+```
+
+Cela crée une base de donnée finale 
