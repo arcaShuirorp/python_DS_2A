@@ -5,16 +5,14 @@
 
 Cette base de données regroupe des informations cinématographiques issues de TMDB et IMDb.
 
-Il s'agit de donnée sur le 10 000 films les plus votés sur TMDB enrichi par les données de ces films sur IMDb.
+Il s'agit de données sur les 10 000 films les plus votés sur TMDB enrichies par les données de ces films sur IMDb.
 
-L'objectif est d'obtenir une base de donnée final à partir duquel faire toutes les manipulations suivantes
+L'objectif est d'obtenir une base de données finale à partir de laquelle on peut faire les études statistiques.
 
 ## 2. Sources des données
-Pour IMDb voici le lien 
-https://datasets.imdbws.com
+Le lien vers les datasets utilisés pour IMDb est : https://datasets.imdbws.com
 
-POur TMDB les données proviennent de l'API :
-https://developer.themoviedb.org/reference/getting-started
+Les données issues de TMDB proviennent de son API : https://developer.themoviedb.org/reference/getting-started
 
 
 | Source | Fichier | Informations apportées |
@@ -33,7 +31,7 @@ La table TMDB constitue la table principale. Les données IMDb sont intégrées 
 Les principales opérations réalisées sont :
 - On récupère les identifiant imdb des 10 000 films TMDB
 - Filtrage des données IMDb pour conserver les films de l'échantillon.
-- Récupération des noms des acteurs, réalisateurs et scénaristes qui sont des identifiants dans les tables title.crew et title.principals il faut donc aller chercher les noms dans name.basics .
+- Récupération des noms des acteurs, réalisateurs et scénaristes qui sont des identifiants dans les tables title.crew et title.principals il faut donc aller chercher les noms dans name.basics.
 - Fusion des tables à l'aide de jointures à gauche.
 - Renommage des colonnes pour distinguer les données TMDB et IMDb.
 
