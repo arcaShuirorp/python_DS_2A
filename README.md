@@ -80,7 +80,7 @@ Pour générer le jeu de données à partir de la base Imdb :
 python Script/fetch_IMDB.py
 ```
 
-Cela génère quatre tablesParquet dans le chemin `data/title.crew.parquet`,`data/title.principals.parquet`,`data/name.basics.parquet`,`data/title.ratings.parquet`.
+Cela génère quatre tables Parquet dans le chemin `data/title.crew.parquet`,`data/title.principals.parquet`,`data/name.basics.parquet`,`data/title.ratings.parquet`.
 
 
 ### Créer la base donnée finale
@@ -91,4 +91,9 @@ Pour créer la base de donnée finale à  partir des données IMDb et TMDB
 python Script/join.py
 ```
 
-Cela crée une base de donnée finale 
+Cela crée une base de donnée finale dans le chemin `data/films_merged.parquet`.
+
+
+## Synthèse
+
+Une synthèse du projet est détaillée dans le notebook Python `synthese.ipynb`.
