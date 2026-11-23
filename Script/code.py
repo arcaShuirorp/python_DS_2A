@@ -2,9 +2,9 @@ import pandas as pd
 
 df = pd.read_parquet("data/films_merged.parquet")
 
-top_20 = df.sort_values(
+top = df.sort_values(
     by="numVotes_IMDb",
     ascending=False
-).head(20)
+)
 
-print(df[["id","imdb_id", "title", "release_date", "runtime"]].head(100))
+print(df[df["title"].str.contains("Toy Story", case=False, na=False)][["id", "title", "release_date"]])

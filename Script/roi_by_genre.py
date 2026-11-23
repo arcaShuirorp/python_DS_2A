@@ -72,14 +72,14 @@ def roi_by_genre(df):
 # === Partie visu
 
 HIGHLIGHTED_MOVIES = {
-    597: "Titanic",
-    550: "Fight Club",
-    289: "Casablanca",
-    496243: "Parasite",
-    429:  "Le Bon, la Brute et le Truand",
-    500:  "Reservoir Dogs",
-    346: "Les Sept Samouraïs",
-    194: "Le Fabuleux Destin d'Amélie Poulain"
+    99770: "Astérix & Obélix : Au service de Sa Majesté",
+    15588: "OSS 117: Lost in Rio",
+    99861: "Avengers: Age of Ultron",
+    324857: "Spider-Man: Into the Spider-Verse",
+    10193:  "Toy Story 3",
+    466272:  "Once Upon a Time in... Hollywood",
+    8885: "Taxi",
+    1895: "Star Wars: Episode III - Revenge of the Sith"
 }
 
 def _name_and_color(highlight):
@@ -147,7 +147,7 @@ def draw_ridgeline(film_genres, stats, cmap_name="Greens_d"):
    
     # === Données locales 
     sns.set_style("white")
-    LOG_RANGE = (-2, 2)
+    LOG_RANGE = (-3, 2)
     BW_ADJUST = 0.3  # Lisse + ou - fortement les distributions
 
     # === Création du graphique
@@ -210,12 +210,9 @@ def draw_ridgeline(film_genres, stats, cmap_name="Greens_d"):
     plt.show()
 
 
-
-
-
 def main():
     film_genres, stats = roi_by_genre(df)
     draw_ridgeline(film_genres, stats)
 
-main()
-
+if __name__ == "__main__":
+    main() 
