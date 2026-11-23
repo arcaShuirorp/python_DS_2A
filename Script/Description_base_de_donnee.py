@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 
 def plot_films_par_annee(films):
@@ -18,45 +20,63 @@ def plot_films_par_annee(films):
     plt.show()
 
 
-
 def plot_notes_imdb_tmdb(films):
-    imdb = pd.to_numeric(films["averageRating_IMDb"], errors="coerce")
-    tmdb = pd.to_numeric(films["vote_average_TMDB"], errors="coerce")
-    tmdb = tmdb.where(tmdb > 0)  # les 0 de TMDB = films sans vote
+    
+    # === Mise en forme des données
+    notes = pd.DataFrame({
+        "IMDb": pd.to_numeric(films["averageRating_IMDb"], errors="coerce"),
+        "TMDB": pd.to_numeric(films["vote_average_TMDB"], errors="coerce"),
+    })
+    notes["TMDB"] = notes["TMDB"].where(notes["TMDB"] > 0)   
+    notes = notes.dropna()                                   
 
-    # Corrélation sur les films ayant les deux notes
-    mask = imdb.notna() & tmdb.notna()
-    corr = imdb[mask].corr(tmdb[mask])
-    print(f"Films avec les deux notes : {mask.sum():,}")
+    corr = notes["IMDb"].corr(notes["TMDB"])
+    print(f"Films avec les deux notes : {len(notes):,}")
     print(f"Corrélation IMDb / TMDB : {corr:.3f}")
 
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    # === Création du graphique
+    cmap = sns.color_palette("Greens", as_cmap=True)
+    dark = cmap(0.85)
 
-    # Distribution des notes IMDb
-    axes[0].hist(imdb.dropna(), bins=40)
-    axes[0].set_title("Distribution des notes IMDb")
-    axes[0].set_xlabel("Note")
-    axes[0].set_ylabel("Nombre de films")
+    with sns.axes_style("white"):
+        g = sns.JointGrid(data=notes, x="IMDb", y="TMDB", height=7, space=0)
 
-    # Distribution des notes TMDB
-    axes[1].hist(tmdb.dropna(), bins=40, color="tab:orange")
-    axes[1].set_title("Distribution des notes TMDB")
-    axes[1].set_xlabel("Note")
+    # === Paramètres pour le jointplot avec aplats de couleur façon aura + points
+    g.plot_joint(
+        sns.kdeplot, fill=True, cmap=cmap, levels=[0.05, 0.2, 0.4, 0.6, 0.8, 1],
+        thresh=0.02, clip=((2, 10), (2, 10)),
+    )
 
-    # Corrélation
-    axes[2].scatter(imdb[mask], tmdb[mask], s=5, alpha=0.3)
-    axes[2].plot([0, 10], [0, 10], color="red", linestyle="--", label="y = x")
-    axes[2].set_title(f"IMDb vs TMDB (corr = {corr:.2f})")
-    axes[2].set_xlabel("Note IMDb")
-    axes[2].set_ylabel("Note TMDB")
-    axes[2].legend()
+    sns.scatterplot(
+        data=notes, x="IMDb", y="TMDB", ax=g.ax_joint,
+        s=10, color=dark, alpha=0.15, linewidth=0,
+    )
 
-    plt.tight_layout()
+    # Régression avec bande de confiance à 95% (elle se voit pas mdrrr)
+    sns.regplot(
+        data=notes, x="IMDb", y="TMDB", scatter=False, ax=g.ax_joint,
+        ci=95, n_boot=500, color="#1f2d3d", line_kws=dict(linewidth=2),
+    )
+
+    # === Paramètres pour les histos sur les marges 
+    g.plot_marginals(
+        sns.histplot, color=cmap(0.7), alpha=1, bins=40,
+        edgecolor="white", linewidth=1 
+    )
+
+    # === Titre labels et axes
+    g.ax_joint.set_xlim(2, 10)   
+    g.ax_joint.set_ylim(2, 10)
+    g.set_axis_labels("Note IMDb", "Note TMDB")
+    sns.despine(fig=g.figure, left=True, bottom=True)
+    for side in ("left", "bottom"):
+        g.ax_joint.spines[side].set_color("#9aa5b1")
+        g.ax_joint.spines[side].set_linewidth(1)
+    g.ax_joint.tick_params(length=3, color="#9aa5b1")
+    g.ax_joint.grid(color="#e6e9ed", linewidth=0.8)
+    g.ax_joint.set_axisbelow(True)
+
+    g.figure.suptitle(f"IMDb vs TMDB (corr = {corr:.2f})", y=0.98, fontweight="bold")
+    g.figure.subplots_adjust(top=0.92)
+
     plt.show()
-    
-
-
-
-
-
-
