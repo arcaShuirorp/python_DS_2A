@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import pandas as pd
 import pyarrow.dataset as ds
@@ -18,6 +19,9 @@ print("Chargement des données...")
 # Chargement des tables
 print("Chargement TMDB")
 tmdb = read_parquet_safe(DATA_DIR / "tmdb_movies_10k.parquet")
+
+# Suppression des films sans identifiant IMDb (il y en a que 7)
+tmdb = tmdb.dropna(subset=["imdb_id"]).copy()
 
 print("Chargement name.basics")
 names = read_parquet_safe(
@@ -49,16 +53,14 @@ print("\nRécupération des noms des réalisateurs...")
 name_dict = names.set_index("nconst")["primaryName"].to_dict()
 
 def ids_to_names(x):
-    # Chaîne "nm0000229,nm0000233" (ou \N si inconnu)
-    if isinstance(x, str):
-        if x.strip() in ("", r"\N"):
-            return []
-        ids = [v.strip() for v in x.split(",")]
-    # Liste ou tableau numpy
-    elif isinstance(x, (list, tuple)) or hasattr(x, "tolist"):
-        ids = [str(v).strip() for v in x]
-    else:
+    '''
+    Renvoit depuis un identifiant nconst le nom de la personne obtenu sur name.basics
+    '''
+    if not isinstance(x, str) or x.strip() in ("", r"\N"):
         return []
+
+    ids = [v.strip() for v in x.split(",")]
+
     return [name_dict.get(i, i) for i in ids]
 
 crew["directors"] = crew["directors"].apply(ids_to_names)
@@ -104,23 +106,16 @@ principals = principals[
 # Tri par ordre d'importance IMDb
 principals = principals.sort_values(["tconst", "ordering"])
 
-# Récupération des noms des acteurs
-principals = principals.merge(
-    names,
-    how="left",
-    on="nconst",
-    validate="many_to_one"
-)
-
-# Création d'une liste de noms d'acteurs par film
+# Création d'une liste d'identifiants d'acteurs par film
 principals_grouped = (
     principals
-    .groupby("tconst")["primaryName"]
-    .apply(list)
+    .groupby("tconst")["nconst"]
+    .apply(lambda x: ",".join(x.dropna().astype(str)))
     .reset_index(name="principals")
 )
 
-
+# Conversion des identifiants des acteurs en noms
+principals_grouped["principals"] = principals_grouped["principals"].apply(ids_to_names)
 
 
 print("\nJointure")
@@ -129,28 +124,31 @@ films = tmdb.merge(
     how="left",
     left_on="imdb_id",
     right_on="tconst",
-    validate="many_to_one"
+    validate="one_to_one"
 )
+
 
 films = films.merge(
     ratings,
     how="left",
     on="tconst",
-    validate="many_to_one"
+    validate="one_to_one"
 )
+
 
 films = films.merge(
     crew,
     how="left",
     on="tconst",
-    validate="many_to_one"
+    validate="one_to_one"
 )
+
 
 films = films.merge(
     principals_grouped,
     how="left",
     on="tconst",
-    validate="many_to_one"
+    validate="one_to_one"
 )
 
 # Renommage des colonnes pour identifier leur source
@@ -171,6 +169,18 @@ films = films.rename(columns={
     "writers": "writers_IMDb",
     "principals": "principals_IMDb"
 })
+
+#Suppressiones colonnes inutiles qui font doublon 
+
+colonnes_a_supprimer = [
+    "tconst",                 
+    "runtimeMinutes_IMDb",    
+    "originalTitle_IMDb",     
+]
+
+films = films.drop(
+    columns=colonnes_a_supprimer
+)
 
 # Export
 films.to_parquet(OUTPUT_FILE, index=False)
