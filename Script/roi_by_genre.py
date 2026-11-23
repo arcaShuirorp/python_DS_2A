@@ -72,7 +72,7 @@ def roi_by_genre(df):
 # === Partie visu
 
 HIGHLIGHTED_MOVIES = {
-    99770: "Astérix & Obélix : Au service de Sa Majesté",
+    99770: "Astérix and Obélix : God Save Britannia",
     15588: "OSS 117: Lost in Rio",
     99861: "Avengers: Age of Ultron",
     324857: "Spider-Man: Into the Spider-Verse",
