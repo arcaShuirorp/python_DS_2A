@@ -73,7 +73,7 @@ Les principales opérations réalisées sont :
 | `belongs_to_collection_name` | Nom de la collection TMDB associée au film |
 | `directors_IMDb` | Noms des réalisateurs identifiés par IMDb |
 | `writers_IMDb` | Noms des scénaristes identifiés par IMDb |
-| `principals_IMDb` | Noms des acteurs et actrices principaux identifiés par IMDb |
+| `principals_IMDb` | Noms des acteurs et actrices principaux identifiés par IMDb, ordonnés par ordre d'importance |
 
 ## 6. Fichier final
 
