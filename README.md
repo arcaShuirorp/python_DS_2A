@@ -25,6 +25,12 @@ python_DS_2A
 ├── LICENSE
 ├── README.md
 ├── data/                                   # Dossier généré contenant les données générées
+|   ├── films_merged.parquet
+|   ├── title.crew.parquet
+|   ├── title.principals.parquet
+|   ├── name.basics.parquet
+|   ├── title.ratings.parquet
+|   └── tmdb_movies_10k.parquet
 └── Script/
     ├── code.py
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
