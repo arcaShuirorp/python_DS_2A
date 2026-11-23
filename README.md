@@ -99,6 +99,7 @@ python Script/join.py
 
 Cela crée une base de donnée finale dans le chemin `data/films_merged.parquet`.
 
+Pour retrouver une description détaillée de la table ainsi construite, voir [par là](Documentation/docu_film_merged.md). 
 
 ## Synthèse
 
