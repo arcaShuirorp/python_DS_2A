@@ -33,6 +33,7 @@ python_DS_2A
 |   └── tmdb_movies_10k.parquet
 └── Script/
     ├── code.py
+    ├── Description_base_de_donnee.py       #Quelques stats descriptives sur notre base de donnée
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
     ├── fetch_IMDB.py                       # Collecte des films depuis la base IMDB
     ├── join.py                             # Joint à gauche la base de donnée IMDb sur la base de donnée TMDB
