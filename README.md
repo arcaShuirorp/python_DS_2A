@@ -25,6 +25,12 @@ python_DS_2A
 ├── LICENSE
 ├── README.md
 ├── data/                                   # Dossier généré contenant les données générées
+|   ├── films_merged.parquet
+|   ├── title.crew.parquet
+|   ├── title.principals.parquet
+|   ├── name.basics.parquet
+|   ├── title.ratings.parquet
+|   └── tmdb_movies_10k.parquet
 └── Script/
     ├── code.py
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
@@ -80,7 +86,7 @@ Pour générer le jeu de données à partir de la base Imdb :
 python Script/fetch_IMDB.py
 ```
 
-Cela génère quatre tablesParquet dans le chemin `data/title.crew.parquet`,`data/title.principals.parquet`,`data/name.basics.parquet`,`data/title.ratings.parquet`.
+Cela génère quatre tables Parquet dans le chemin `data/title.crew.parquet`,`data/title.principals.parquet`,`data/name.basics.parquet`,`data/title.ratings.parquet`.
 
 
 ### Créer la base donnée finale
@@ -91,4 +97,10 @@ Pour créer la base de donnée finale à  partir des données IMDb et TMDB
 python Script/join.py
 ```
 
-Cela crée une base de donnée finale 
+Cela crée une base de donnée finale dans le chemin `data/films_merged.parquet`.
+
+Pour retrouver une description détaillée de la table ainsi construite, voir [par là](Documentation/docu_film_merged.md). 
+
+## Synthèse
+
+Une synthèse du projet est détaillée dans le notebook Python `synthese.ipynb`.

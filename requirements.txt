@@ -7,3 +7,4 @@ tqdm>=4.70.1
 matplotlib>=3.9.4
 numpy>=2.0.2
 ipykernel>=6.29.5
+seaborn>=0.13.2
