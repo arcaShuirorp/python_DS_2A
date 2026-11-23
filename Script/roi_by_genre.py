@@ -44,7 +44,7 @@ def visualize_data(df):
 def roi_by_genre(df):
     """Calcule des stats sur la rentabilité moyenne d'un film (revenue/budget) par genre de film suffisamment représenté"""
 
-    MIN_BUDGET = 1000
+    MIN_BUDGET = 10000
     MIN_FILMS = 30
 
     data = df[["id", "genres_TMDB", "budget", "revenue"]].copy()
