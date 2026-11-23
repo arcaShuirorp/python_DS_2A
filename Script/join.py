@@ -50,18 +50,27 @@ crew = read_parquet_safe(DATA_DIR / "title.crew.parquet")
 # Conversion des identifiants des réalisateurs en noms
 print("\nRécupération des noms des réalisateurs...")
 
+name_dict = names.set_index("nconst")["primaryName"].to_dict() #crée un dictionnaire avec clé les identifiants et comme valeur les noms
+
 name_dict = names.set_index("nconst")["primaryName"].to_dict()
 
 def ids_to_names(x):
-    '''
-    Renvoit depuis un identifiant nconst le nom de la personne obtenu sur name.basics
-    '''
-    if not isinstance(x, str) or x.strip() in ("", r"\N"):
+    """
+    Renvoie les noms des personnes à partir de leurs identifiants nconst.
+    """
+
+    if not isinstance(x, str) or x == r"\N":
         return []
 
-    ids = [v.strip() for v in x.split(",")]
+    ids = x.split(",")
 
-    return [name_dict.get(i, i) for i in ids]
+    noms = []
+
+    for identifiant in ids:
+        nom = name_dict.get(identifiant)
+        noms.append(nom)
+
+    return noms
 
 crew["directors"] = crew["directors"].apply(ids_to_names)
 crew["writers"] = crew["writers"].apply(ids_to_names)
