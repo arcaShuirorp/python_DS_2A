@@ -20,8 +20,7 @@ print("Chargement des données...")
 print("Chargement TMDB")
 tmdb = read_parquet_safe(DATA_DIR / "tmdb_movies_10k.parquet")
 
-# Suppression des films sans identifiant IMDb (il y en a que 7)
-tmdb = tmdb.dropna(subset=["imdb_id"]).copy()
+
 
 print("Chargement name.basics")
 names = read_parquet_safe(

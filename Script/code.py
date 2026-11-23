@@ -1,10 +1,6 @@
 import pandas as pd
 
+df = pd.read_parquet("data/tmdb_movies_10k.parquet")
 
-
-df = pd.read_parquet("data/films_merged.parquet")
-
-print(df.columns)
-print(df.head())
-
-print(len(df))
+# Afficher les 20 premiers films
+print(df[["id", "title", "release_date", "runtime"]].head(20))
