@@ -11,7 +11,7 @@ def plot_films_par_annee(films):
 
     par_an = annees.dropna().astype(int).value_counts().sort_index()
 
-    plt.figure(figsize=(12, 5))
+    plt.figure(figsize=(14, 5))
     plt.bar(par_an.index, par_an.values, width=0.9)
     plt.title("Nombre de films par année de sortie")
     plt.xlabel("Année")
