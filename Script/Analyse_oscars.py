@@ -96,6 +96,16 @@ films_connus = df_reg2[
 
 ### Fonctions à utiliser dans la synthèse
 
+
+def stats():
+    stats = df_reg2.groupby("nb_acteurs_oscarises").agg(
+        nb_films=("id", "count"),
+    ).round(2)
+    print(stats)
+
+
+
+
 def note_oscar():
 
     groupes = [
@@ -178,8 +188,8 @@ def note_oscar_bin():
 
 def renta_oscar():
 
-    # Statistiques descriptives
-    stats_roi = df_reg2.groupby("acteur_oscarise").agg(
+    # stats
+    stats_roi = df_reg2[df_reg2["budget"] > 0].groupby("acteur_oscarise").agg(
         nb_films=("id", "count"),
         budget_moyen=("budget", "mean"),
         revenue_moyen=("revenue", "mean"),
@@ -190,11 +200,10 @@ def renta_oscar():
 
     print(stats_roi)
 
-    # Création du graphique
     fig, ax = plt.subplots(figsize=(12, 7))
 
     sns.boxplot(
-        data=df_reg2,
+        data=df_reg2[df_reg2["budget"] > 0],
         x="acteur_oscarise",
         y="ROI",
         hue="acteur_oscarise",
@@ -205,7 +214,6 @@ def renta_oscar():
         ax=ax
     )
 
-    # Affichage des films connus
     films_a_afficher = films_connus.dropna(
         subset=["acteur_oscarise", "ROI"]
     )
@@ -228,7 +236,7 @@ def renta_oscar():
             label=film["title"]
         )
 
-    # Mise en forme
+
     ax.axhline(0, color="black", linewidth=1.2, linestyle="--", alpha=0.7)
 
     ax.set_title(
@@ -243,8 +251,6 @@ def renta_oscar():
 
     ax.set_xticks([0, 1])
     ax.set_xticklabels(["Non", "Oui"])
-
-    # Suppression des doublons dans la légende
     handles, labels = ax.get_legend_handles_labels()
     elements = dict(zip(labels, handles))
 
@@ -263,13 +269,11 @@ def renta_oscar():
     plt.tight_layout()
     plt.show()
 
-    print(stats_roi)
-
 
 def renta_nb_oscar():
 
-    # Statistiques descriptives
-    stats_roi = df_reg2.groupby("nb_acteurs_oscarises").agg(
+    # statistiques affichées dans la synthèse
+    stats_roi = df_reg2[df_reg2["budget"] > 0].groupby("nb_acteurs_oscarises").agg(
         nb_films=("id", "count"),
         budget_moyen=("budget", "mean"),
         revenue_moyen=("revenue", "mean"),
@@ -279,14 +283,12 @@ def renta_nb_oscar():
     ).round(2)
 
     print(stats_roi)
-
-    # Création du graphique
     fig, ax = plt.subplots(figsize=(12, 7))
 
     categories = sorted(df_reg2["nb_acteurs_oscarises"].dropna().unique())
 
     sns.boxplot(
-        data=df_reg2,
+        data=df_reg2[df_reg2["budget"] > 0],
         x="nb_acteurs_oscarises",
         y="ROI",
         hue="nb_acteurs_oscarises",
@@ -297,7 +299,7 @@ def renta_nb_oscar():
         ax=ax
     )
 
-    # Affichage des films connus
+    #Films connus
     films_a_afficher = films_connus.dropna(
         subset=["nb_acteurs_oscarises", "ROI"]
     )
@@ -328,7 +330,6 @@ def renta_nb_oscar():
             fontsize=8
         )
 
-    # Mise en forme
     ax.axhline(
         0,
         color="black",
@@ -350,7 +351,6 @@ def renta_nb_oscar():
     ax.set_xticks(range(len(categories)))
     ax.set_xticklabels(categories)
 
-    # Suppression des doublons dans la légende
     handles, labels = ax.get_legend_handles_labels()
     elements = dict(zip(labels, handles))
 
@@ -372,19 +372,18 @@ def renta_nb_oscar():
 
 def corr_budget_acteurs_osc():
 
-    # Statistiques descriptives
-    stats_budget = df_reg2.groupby("nb_acteurs_oscarises").agg(
+    # statistiques affichées dans la synthèse
+    stats_budget = df_reg2[df_reg2["budget"]>0].groupby("nb_acteurs_oscarises").agg(
         nb_films=("id", "count"),
         budget_moyen=("budget", "mean"),
         budget_median=("budget", "median"),
-        budget_min=("budget", "min"),
         budget_max=("budget", "max")
     ).round(2)
 
     print("\nSTATISTIQUES DESCRIPTIVES")
     print(stats_budget)
 
-    # Données pour la régression
+    # données pour la régression
     df_reg = df_reg2[
         (df_reg2["budget"] > 0) &
         df_reg2["nb_acteurs_oscarises"].notna()
@@ -392,7 +391,7 @@ def corr_budget_acteurs_osc():
 
     df_reg["log_budget"] = np.log(df_reg["budget"])
 
-    # Régression linéaire
+
     X = sm.add_constant(df_reg["nb_acteurs_oscarises"])
     y = df_reg["log_budget"]
 
@@ -400,8 +399,10 @@ def corr_budget_acteurs_osc():
 
     print("\nRÉSULTATS DE LA RÉGRESSION")
     print(modele.summary())
+    print("\nCOEFFICIENTS :")
+    print(modele.params)
 
-    # Création du graphique
+    
     fig, ax = plt.subplots(figsize=(12, 7))
 
     categories = sorted(
@@ -416,7 +417,6 @@ def corr_budget_acteurs_osc():
         color="#4C78A8"
     )
 
-    # Droite de régression retranscrite en budget
     x_ligne = np.linspace(min(categories), max(categories), 100)
 
     y_ligne = modele.params.iloc[0] + modele.params.iloc[1] * x_ligne
@@ -454,7 +454,6 @@ def corr_budget_acteurs_osc():
             label=film["title"]
         )
 
-    # Mise en forme
     ax.set_yscale("log")
 
     ax.set_title(
@@ -470,7 +469,6 @@ def corr_budget_acteurs_osc():
     ax.set_xticks(categories)
     ax.set_xticklabels(categories)
 
-    # Légende sans doublons
     handles, labels = ax.get_legend_handles_labels()
     elements = dict(zip(labels, handles))
 
@@ -493,7 +491,7 @@ def corr_budget_acteurs_osc():
 
 def revenue_et_budget_vs_osc():
 
-    # Statistiques descriptives
+    # statistiques descriptives (montrées dans la synthèse)
     stats = df_reg2.groupby("acteur_oscarise").agg(
         nb_films=("id", "count"),
         budget_moyen=("budget", "mean"),
@@ -504,6 +502,7 @@ def revenue_et_budget_vs_osc():
 
     print("\nSTATISTIQUES DESCRIPTIVES")
     print(stats)
+    
 
     # Création des graphiques
     fig, axes = plt.subplots(1, 2, figsize=(15, 7))
@@ -527,7 +526,6 @@ def revenue_et_budget_vs_osc():
 
     for ax, (variable, titre) in zip(axes, variables):
 
-        # Boxplot
         sns.boxplot(
             data=df_reg2,
             x="acteur_oscarise",
@@ -540,7 +538,7 @@ def revenue_et_budget_vs_osc():
             ax=ax
         )
 
-        # Données pour la régression
+        # données pour la régression
         df_reg = df_reg2[
             (df_reg2[variable] > 0) &
             df_reg2["acteur_oscarise"].notna()
@@ -548,7 +546,6 @@ def revenue_et_budget_vs_osc():
 
         df_reg["log_variable"] = np.log(df_reg[variable])
 
-        # Régression linéaire
         X = sm.add_constant(df_reg["acteur_oscarise"].astype(int))
         y = df_reg["log_variable"]
 
@@ -556,8 +553,9 @@ def revenue_et_budget_vs_osc():
 
         print(f"\nRÉSULTATS DE LA RÉGRESSION : {titre.upper()}")
         print(modele.summary())
+        print("\nCOEFFICIENTS :")
+        print(modele.params)
 
-        # Droite de régression retranscrite en valeurs originales
         x_ligne = np.array([0, 1])
 
         y_ligne = (
@@ -593,10 +591,9 @@ def revenue_et_budget_vs_osc():
                 label=film["title"]
             )
 
-        # Échelle logarithmique
-        ax.set_yscale("log")
 
-        # Mise en forme
+        ax.set_yscale("log") # échelle logarithmique
+
         ax.set_title(
             f"{titre} selon la présence d'acteurs oscarisés",
             fontsize=13,
@@ -613,7 +610,6 @@ def revenue_et_budget_vs_osc():
         ax.grid(axis="y", alpha=0.2, which="both")
         sns.despine(ax=ax)
 
-    # Légende commune
     handles, labels = axes[0].get_legend_handles_labels()
     elements = dict(zip(labels, handles))
 
