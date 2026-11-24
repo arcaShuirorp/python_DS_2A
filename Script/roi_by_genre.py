@@ -42,7 +42,7 @@ def visualize_data(df):
 
 
 def roi_by_genre(df):
-    """Calcule des stats sur la rentabilité moyenne d'un film (revenue/budget) par genre de film suffisamment représenté"""
+    """Calcule des stats sur la rentabilité moyenne/médiane d'un film (revenue/budget) par genre de film suffisamment représenté"""
 
     MIN_BUDGET = 10000
     MIN_FILMS = 30
@@ -78,7 +78,7 @@ HIGHLIGHTED_MOVIES = {
     324857: "Spider-Man: Into the Spider-Verse",
     10193:  "Toy Story 3",
     466272:  "Once Upon a Time in... Hollywood",
-    8885: "Taxi",
+    2330: "Taxi",
     1895: "Star Wars: Episode III - Revenge of the Sith"
 }
 

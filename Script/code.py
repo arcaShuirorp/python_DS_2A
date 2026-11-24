@@ -7,4 +7,4 @@ top = df.sort_values(
     ascending=False
 )
 
-print(df[df["title"].str.contains("Toy Story", case=False, na=False)][["id", "title", "release_date"]])
+print(df[df["title"].str.contains("Taxi", case=False, na=False)][["id", "title", "release_date", "genres_TMDB"]])
