@@ -31,8 +31,8 @@ df = pd.read_parquet(DATA_DIR / "films_merged.parquet")
 def budget_revenue_by_genre(df, sort_by="revenue_median"):
     """Calcule des stats sur les budgets et revenus moyens/médians d'un film par genre de film suffisamment représenté"""
 
-    MIN_BUDGET = 10_000
-    MIN_REVENUE = 10_000   
+    MIN_BUDGET = 10000
+    MIN_REVENUE = 10000   
     MIN_FILMS = 30
 
     data = df[["id", "genres_TMDB", "budget", "revenue"]]
