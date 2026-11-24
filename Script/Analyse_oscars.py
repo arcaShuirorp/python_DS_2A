@@ -77,15 +77,6 @@ df_reg2["ROI"] = np.where(
 
 ### Liste de films connus pour les étudier à part
 
-liste_films_connus = ["Astérix and Obélix : God Save Britannia", 
-    "OSS 117: Lost in Rio",
-    "Avengers: Age of Ultron",
-    "Spider-Man: Into the Spider-Verse",
-    "Toy Story 3",
-    "Once Upon a Time in... Hollywood",
-    "Taxi",
-    "Star Wars: Episode III - Revenge of the Sith"]
-
 liste_films_connus = [
     "Astérix and Obélix : God Save Britannia",
     "OSS 117: Lost in Rio",
