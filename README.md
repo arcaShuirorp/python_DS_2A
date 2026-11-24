@@ -37,14 +37,13 @@ python_DS_2A
 |   ├── master-data-list-of-oscar-award-winners-and-nominees-as-of-2026
 |   └── tmdb_movies_10k.parquet
 └── Script/
-    ├── code.py
+    ├── Analyse_oscars.py                   # Statistiques descriptives concernant les acteurs oscarisés (partie 2.3 de la synthèse)
     ├── Description_base_de_donnee.py       # Quelques stats descriptives sur notre base de données
     ├── budget_revenue_by_genre.py
     ├── roi_by_genre.py
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
     ├── fetch_IMDB.py                       # Collecte des films depuis la base IMDB
-    ├── join.py    
-    └── test.ipynb
+    └── join.py    
 ```
 
 
