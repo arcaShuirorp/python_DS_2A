@@ -14,8 +14,9 @@ TMDB : Accès via API (l'importation n'est pas possible sans clé API obtenable 
 IMDB : Accès via base de données téléchargeable 
        Note du film, nombre de votes
 
-Gagnant des oscars : Site officiel des oscars https://awardsdatabase.oscars.org.
-                     Lien téléchargement : https://dataful.in/datasets/15704/
+Gagnant(s) des oscars : Site officiel des oscars https://awardsdatabase.oscars.org.
+                     
+Lien de téléchargement : https://dataful.in/datasets/15704/
 
 
 ## Structure du projet
@@ -37,7 +38,9 @@ python_DS_2A
 |   └── tmdb_movies_10k.parquet
 └── Script/
     ├── code.py
-    ├── Description_base_de_donnee.py       #Quelques stats descriptives sur notre base de donnée
+    ├── Description_base_de_donnee.py       # Quelques stats descriptives sur notre base de données
+    ├── budget_revenue_by_genre.py
+    ├── roi_by_genre.py
     ├── fetch_TMDB.py                       # Collecte des films via l'API TMDB
     ├── fetch_IMDB.py                       # Collecte des films depuis la base IMDB
     ├── join.py    
@@ -89,15 +92,14 @@ Cela génère quatre tables Parquet dans le chemin `data/title.crew.parquet`,`da
 
 ### Jeu de données TMDB
 
-
-
 Pour générer le jeu de données à partir de la base TMDB :
 
 
 ```bash
 python Script/fetch_TMDB.py
 ```
-L'éxécution prend du temps jusqu'à 20 min, deux fichier tmdb_candidates_imdb et tmdb_candidates_imdb vont être créés pour éviter de devoir relancer l'entiereté du script en cas d'échec.
+
+L'exécution prend du temps jusqu'à 20 min, deux fichiers tmdb_candidates_imdb et tmdb_candidates_imdb vont être créés pour éviter de devoir relancer l'entièreté du script en cas d'échec.
  
 Cela génère une table Parquet dans le chemin `data/tmdb_movies_10k.parquet`. 
 
@@ -109,7 +111,7 @@ Pour les oscars il est nécessaire d'importer master-data-list-of-oscar-award-wi
 
 ### Créer la base donnée finale
 
-Pour créer la base de donnée finale à  partir des données IMDb et TMDB
+Pour créer la base de données finale à partir des données IMDb et TMDB :
 
 ```bash
 python Script/join.py
