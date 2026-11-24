@@ -2,7 +2,9 @@ from pathlib import Path
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
-
+import numpy as np
+import seaborn as sns
+import statsmodels.api as sm
 
 
 #### On complète les tables par les informations sur les acteurs
@@ -16,7 +18,7 @@ df_reg2["averageRating_IMDb"] = pd.to_numeric(
     errors="coerce"
 )
 
-df_reg2 = df_reg2.dropna(subset = ["principals_IMDb", "release_date"]) #Il nous faut les noms d'acteurs et l'année de sortie du film pour pouvoir faire l'analyse
+df_reg2 = df_reg2.dropna(subset = ["principals_IMDb", "release_date"]) #Il nous faut les noms des acteurs et l'année de sortie du film pour pouvoir faire l'analyse
 
 df_reg2["release_year"] = pd.to_datetime(
     df_reg2["release_date"],
@@ -56,6 +58,25 @@ df_reg2["nb_acteurs_oscarises"] = df_reg2.apply(
 
 df_reg2["acteur_oscarise"] = (df_reg2["nb_acteurs_oscarises"]>0) # False ou True
 
+
+
+### On complète les tables avec les informations sur la rentabilité des films
+
+df_reg2["budget"] = pd.to_numeric(df_reg2["budget"], errors="coerce")
+df_reg2["revenue"] = pd.to_numeric(df_reg2["revenue"], errors="coerce")
+
+# Création des variables de rentabilité
+df_reg2["benefice"] = df_reg2["revenue"] - df_reg2["budget"]
+
+df_reg2["ROI"] = np.where(
+    df_reg2["budget"] > 0,
+    (df_reg2["revenue"] - df_reg2["budget"]) / df_reg2["budget"] * 100,
+    np.nan
+)
+
+
+### Liste de films connus pour les étudier à part
+
 liste_films_connus = ["Astérix and Obélix : God Save Britannia", 
     "OSS 117: Lost in Rio",
     "Avengers: Age of Ultron",
@@ -65,8 +86,24 @@ liste_films_connus = ["Astérix and Obélix : God Save Britannia",
     "Taxi",
     "Star Wars: Episode III - Revenge of the Sith"]
 
+liste_films_connus = [
+    "Astérix and Obélix : God Save Britannia",
+    "OSS 117: Lost in Rio",
+    "Avengers: Age of Ultron",
+    "Spider-Man: Into the Spider-Verse",
+    "Toy Story 3",
+    "Once Upon a Time in... Hollywood",
+    "Taxi",
+    "Star Wars: Episode III - Revenge of the Sith"
+]
 
-#####
+films_connus = df_reg2[
+    df_reg2["title"].isin(liste_films_connus)
+].copy()
+
+
+
+### Fonctions à utiliser dans la synthèse
 
 def note_oscar():
 
@@ -85,7 +122,6 @@ def note_oscar():
     plt.title("Note des films selon le nombre d'acteurs oscarisés")
     plt.grid(axis="y", alpha=0.3)
 
-    films_connus = df_reg2[df_reg2["title"].isin(liste_films_connus)]
 
     # Palette de couleurs
     couleurs = plt.cm.tab10.colors
@@ -147,4 +183,457 @@ def note_oscar_bin():
     plt.legend(title="Films connus", bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
     plt.show()
-note_oscar()
+
+
+def renta_oscar():
+
+    # Statistiques descriptives
+    stats_roi = df_reg2.groupby("acteur_oscarise").agg(
+        nb_films=("id", "count"),
+        budget_moyen=("budget", "mean"),
+        revenue_moyen=("revenue", "mean"),
+        benefice_moyen=("benefice", "mean"),
+        ROI_moyen=("ROI", "mean"),
+        ROI_median=("ROI", "median")
+    ).round(2)
+
+    print(stats_roi)
+
+    # Création du graphique
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    sns.boxplot(
+        data=df_reg2,
+        x="acteur_oscarise",
+        y="ROI",
+        hue="acteur_oscarise",
+        palette={False: "#4C78A8", True: "#F58518"},
+        legend=False,
+        showfliers=False,
+        width=0.5,
+        ax=ax
+    )
+
+    # Affichage des films connus
+    films_a_afficher = films_connus.dropna(
+        subset=["acteur_oscarise", "ROI"]
+    )
+
+    couleurs = sns.color_palette("husl", len(liste_films_connus))
+    couleurs_par_film = dict(zip(liste_films_connus, couleurs))
+
+    for _, film in films_a_afficher.iterrows():
+
+        x = int(film["acteur_oscarise"])
+
+        ax.scatter(
+            x,
+            film["ROI"],
+            color=couleurs_par_film[film["title"]],
+            s=130,
+            edgecolor="black",
+            linewidth=1,
+            zorder=5,
+            label=film["title"]
+        )
+
+    # Mise en forme
+    ax.axhline(0, color="black", linewidth=1.2, linestyle="--", alpha=0.7)
+
+    ax.set_title(
+        "Rentabilité selon la présence d'acteurs oscarisés",
+        fontsize=16,
+        fontweight="bold",
+        pad=18
+    )
+
+    ax.set_xlabel("Présence d'un acteur oscarisé", fontsize=12)
+    ax.set_ylabel("ROI (%)", fontsize=12)
+
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(["Non", "Oui"])
+
+    # Suppression des doublons dans la légende
+    handles, labels = ax.get_legend_handles_labels()
+    elements = dict(zip(labels, handles))
+
+    ax.legend(
+        elements.values(),
+        elements.keys(),
+        bbox_to_anchor=(1.02, 1),
+        loc="upper left",
+        title="Films connus",
+        frameon=False
+    )
+
+    sns.despine()
+    ax.grid(axis="y", alpha=0.2)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(stats_roi)
+
+
+def renta_nb_oscar():
+
+    # Statistiques descriptives
+    stats_roi = df_reg2.groupby("nb_acteurs_oscarises").agg(
+        nb_films=("id", "count"),
+        budget_moyen=("budget", "mean"),
+        revenue_moyen=("revenue", "mean"),
+        benefice_moyen=("benefice", "mean"),
+        ROI_moyen=("ROI", "mean"),
+        ROI_median=("ROI", "median")
+    ).round(2)
+
+    print(stats_roi)
+
+    # Création du graphique
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    categories = sorted(df_reg2["nb_acteurs_oscarises"].dropna().unique())
+
+    sns.boxplot(
+        data=df_reg2,
+        x="nb_acteurs_oscarises",
+        y="ROI",
+        hue="nb_acteurs_oscarises",
+        palette="Blues",
+        legend=False,
+        showfliers=False,
+        width=0.5,
+        ax=ax
+    )
+
+    # Affichage des films connus
+    films_a_afficher = films_connus.dropna(
+        subset=["nb_acteurs_oscarises", "ROI"]
+    )
+
+    couleurs = sns.color_palette("husl", len(liste_films_connus))
+    couleurs_par_film = dict(zip(liste_films_connus, couleurs))
+
+    for _, film in films_a_afficher.iterrows():
+
+        x = categories.index(film["nb_acteurs_oscarises"])
+
+        ax.scatter(
+            x,
+            film["ROI"],
+            color=couleurs_par_film[film["title"]],
+            s=130,
+            edgecolor="black",
+            linewidth=1,
+            zorder=5,
+            label=film["title"]
+        )
+
+        ax.annotate(
+            film["title"],
+            (x, film["ROI"]),
+            xytext=(5, 5),
+            textcoords="offset points",
+            fontsize=8
+        )
+
+    # Mise en forme
+    ax.axhline(
+        0,
+        color="black",
+        linewidth=1.2,
+        linestyle="--",
+        alpha=0.7
+    )
+
+    ax.set_title(
+        "ROI selon le nombre d'acteurs oscarisés",
+        fontsize=16,
+        fontweight="bold",
+        pad=18
+    )
+
+    ax.set_xlabel("Nombre d'acteurs oscarisés", fontsize=12)
+    ax.set_ylabel("ROI (%)", fontsize=12)
+
+    ax.set_xticks(range(len(categories)))
+    ax.set_xticklabels(categories)
+
+    # Suppression des doublons dans la légende
+    handles, labels = ax.get_legend_handles_labels()
+    elements = dict(zip(labels, handles))
+
+    ax.legend(
+        elements.values(),
+        elements.keys(),
+        bbox_to_anchor=(1.02, 1),
+        loc="upper left",
+        title="Films connus",
+        frameon=False
+    )
+
+    sns.despine()
+    ax.grid(axis="y", alpha=0.2)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def corr_budget_acteurs_osc():
+
+    # Statistiques descriptives
+    stats_budget = df_reg2.groupby("nb_acteurs_oscarises").agg(
+        nb_films=("id", "count"),
+        budget_moyen=("budget", "mean"),
+        budget_median=("budget", "median"),
+        budget_min=("budget", "min"),
+        budget_max=("budget", "max")
+    ).round(2)
+
+    print("\nSTATISTIQUES DESCRIPTIVES")
+    print(stats_budget)
+
+    # Données pour la régression
+    df_reg = df_reg2[
+        (df_reg2["budget"] > 0) &
+        df_reg2["nb_acteurs_oscarises"].notna()
+    ].copy()
+
+    df_reg["log_budget"] = np.log(df_reg["budget"])
+
+    # Régression linéaire
+    X = sm.add_constant(df_reg["nb_acteurs_oscarises"])
+    y = df_reg["log_budget"]
+
+    modele = sm.OLS(y, X).fit()
+
+    print("\nRÉSULTATS DE LA RÉGRESSION")
+    print(modele.summary())
+
+    # Création du graphique
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    categories = sorted(
+        df_reg2["nb_acteurs_oscarises"].dropna().unique()
+    )
+
+    ax.scatter(
+        df_reg["nb_acteurs_oscarises"],
+        df_reg["budget"],
+        alpha=0.3,
+        s=30,
+        color="#4C78A8"
+    )
+
+    # Droite de régression retranscrite en budget
+    x_ligne = np.linspace(min(categories), max(categories), 100)
+
+    y_ligne = modele.params.iloc[0] + modele.params.iloc[1] * x_ligne
+
+    ax.plot(
+        x_ligne,
+        np.exp(y_ligne),
+        color="red",
+        linewidth=2,
+        label="Régression linéaire sur log(budget)"
+    )
+
+    # Films connus
+    films_a_afficher = films_connus.dropna(
+        subset=["nb_acteurs_oscarises", "budget"]
+    )
+
+    films_a_afficher = films_a_afficher[
+        films_a_afficher["budget"] > 0
+    ]
+
+    couleurs = sns.color_palette("husl", len(liste_films_connus))
+    couleurs_par_film = dict(zip(liste_films_connus, couleurs))
+
+    for _, film in films_a_afficher.iterrows():
+
+        ax.scatter(
+            int(film["nb_acteurs_oscarises"]),
+            film["budget"],
+            color=couleurs_par_film[film["title"]],
+            s=130,
+            edgecolor="black",
+            linewidth=1,
+            zorder=5,
+            label=film["title"]
+        )
+
+    # Mise en forme
+    ax.set_yscale("log")
+
+    ax.set_title(
+        "Budget selon le nombre d'acteurs oscarisés",
+        fontsize=16,
+        fontweight="bold",
+        pad=18
+    )
+
+    ax.set_xlabel("Nombre d'acteurs oscarisés", fontsize=12)
+    ax.set_ylabel("Budget", fontsize=12)
+
+    ax.set_xticks(categories)
+    ax.set_xticklabels(categories)
+
+    # Légende sans doublons
+    handles, labels = ax.get_legend_handles_labels()
+    elements = dict(zip(labels, handles))
+
+    ax.legend(
+        elements.values(),
+        elements.keys(),
+        bbox_to_anchor=(1.02, 1),
+        loc="upper left",
+        title="Films connus",
+        frameon=False
+    )
+
+    sns.despine()
+    ax.grid(axis="y", alpha=0.2, which="both")
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+def revenue_et_budget_vs_osc():
+
+    # Statistiques descriptives
+    stats = df_reg2.groupby("acteur_oscarise").agg(
+        nb_films=("id", "count"),
+        budget_moyen=("budget", "mean"),
+        budget_median=("budget", "median"),
+        revenue_moyen=("revenue", "mean"),
+        revenue_median=("revenue", "median")
+    ).round(2)
+
+    print("\nSTATISTIQUES DESCRIPTIVES")
+    print(stats)
+
+    # Création des graphiques
+    fig, axes = plt.subplots(1, 2, figsize=(15, 7))
+
+    variables = [
+        ("budget", "Budget"),
+        ("revenue", "Revenus")
+    ]
+
+    couleurs_categories = {
+        False: "#4C78A8",
+        True: "#F58518"
+    }
+
+    films_a_afficher = films_connus.dropna(
+        subset=["acteur_oscarise", "budget", "revenue"]
+    )
+
+    couleurs = sns.color_palette("husl", len(liste_films_connus))
+    couleurs_par_film = dict(zip(liste_films_connus, couleurs))
+
+    for ax, (variable, titre) in zip(axes, variables):
+
+        # Boxplot
+        sns.boxplot(
+            data=df_reg2,
+            x="acteur_oscarise",
+            y=variable,
+            hue="acteur_oscarise",
+            palette=couleurs_categories,
+            legend=False,
+            showfliers=False,
+            width=0.5,
+            ax=ax
+        )
+
+        # Données pour la régression
+        df_reg = df_reg2[
+            (df_reg2[variable] > 0) &
+            df_reg2["acteur_oscarise"].notna()
+        ].copy()
+
+        df_reg["log_variable"] = np.log(df_reg[variable])
+
+        # Régression linéaire
+        X = sm.add_constant(df_reg["acteur_oscarise"].astype(int))
+        y = df_reg["log_variable"]
+
+        modele = sm.OLS(y, X).fit()
+
+        print(f"\nRÉSULTATS DE LA RÉGRESSION : {titre.upper()}")
+        print(modele.summary())
+
+        # Droite de régression retranscrite en valeurs originales
+        x_ligne = np.array([0, 1])
+
+        y_ligne = (
+            modele.params.iloc[0] +
+            modele.params.iloc[1] * x_ligne
+        )
+
+        ax.plot(
+            x_ligne,
+            np.exp(y_ligne),
+            color="red",
+            linewidth=2,
+            marker="o",
+            label="Régression sur log"
+        )
+
+        # Films connus
+        for _, film in films_a_afficher.iterrows():
+
+            y_film = film[variable]
+
+            if y_film <= 0:
+                continue
+
+            ax.scatter(
+                int(film["acteur_oscarise"]),
+                y_film,
+                color=couleurs_par_film[film["title"]],
+                s=110,
+                edgecolor="black",
+                linewidth=1,
+                zorder=5,
+                label=film["title"]
+            )
+
+        # Échelle logarithmique
+        ax.set_yscale("log")
+
+        # Mise en forme
+        ax.set_title(
+            f"{titre} selon la présence d'acteurs oscarisés",
+            fontsize=13,
+            fontweight="bold",
+            pad=15
+        )
+
+        ax.set_xlabel("Présence d'un acteur oscarisé", fontsize=11)
+        ax.set_ylabel(titre, fontsize=11)
+
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["Non", "Oui"])
+
+        ax.grid(axis="y", alpha=0.2, which="both")
+        sns.despine(ax=ax)
+
+    # Légende commune
+    handles, labels = axes[0].get_legend_handles_labels()
+    elements = dict(zip(labels, handles))
+
+    fig.legend(
+        elements.values(),
+        elements.keys(),
+        bbox_to_anchor=(1.02, 1),
+        loc="upper left",
+        title="Films connus",
+        frameon=False
+    )
+
+    plt.tight_layout()
+    plt.show()
